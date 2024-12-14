@@ -31,6 +31,7 @@ use frame_support::{
         constants::{RocksDbWeight, WEIGHT_REF_TIME_PER_SECOND},
         IdentityFee, Weight,
     },
+    PalletId,
 };
 use frame_system::limits::{BlockLength, BlockWeights};
 use pallet_transaction_payment::{ConstFeeMultiplier, FungibleAdapter, Multiplier};
@@ -155,8 +156,18 @@ impl pallet_sudo::Config for Runtime {
     type WeightInfo = pallet_sudo::weights::SubstrateWeight<Runtime>;
 }
 
-/// Configure the pallet-template in pallets/template.
-impl kumulus_providers::Config for Runtime {
+parameter_types! {
+    pub const BlocksPerWeek: u32 = 100_800;
+    pub const KumulusPalletId: PalletId = PalletId(*b"kml/escr");
+    pub const MinimumDeposit: Balance = 1_000_000_000; // 1 token
+
+}
+
+impl kumulus::Config for Runtime {
     type RuntimeEvent = RuntimeEvent;
-    //type WeightInfo = kumulus_providers::weights::SubstrateWeight<Runtime>;
+    type Currency = Balances;
+    type BlocksPerWeek = BlocksPerWeek;
+    type PalletId = KumulusPalletId;
+    type MinimumDeposit = MinimumDeposit;
+    //type WeightInfo = kumulus::weights::SubstrateWeight<Runtime>;
 }

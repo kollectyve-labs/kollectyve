@@ -3609,7 +3609,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c33070833c9ee02266356de0c43f723152bd38bd96ddf52c82b3af10c9138b28"
 
 [[package]]
-name = "kumulus-providers"
+name = "kumulus"
 version = "0.1.0"
 dependencies = [
  "frame-benchmarking",
@@ -3620,6 +3620,7 @@ dependencies = [
  "sp-core",
  "sp-io",
  "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -8250,7 +8251,7 @@ dependencies = [
  "frame-system-benchmarking",
  "frame-system-rpc-runtime-api",
  "frame-try-runtime",
- "kumulus-providers",
+ "kumulus",
  "pallet-aura",
  "pallet-balances",
  "pallet-grandpa",

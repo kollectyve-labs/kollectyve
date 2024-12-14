@@ -1,6 +1,6 @@
 [package]
-name = "kumulus-providers"
-description = "Kumulus providers management pallet."
+name = "kumulus"
+description = "Kumulus cloud orchestration pallet."
 version = "0.1.0"
 license = "Unlicense"
 authors.workspace = true
@@ -22,11 +22,13 @@ scale-info = { features = [
 frame-benchmarking = { optional = true, workspace = true }
 frame-support.workspace = true
 frame-system.workspace = true
+sp-std = { workspace = true, default-features = false }
+
 
 [dev-dependencies]
-sp-core = { default-features = true, workspace = true }
 sp-io = { default-features = true, workspace = true }
 sp-runtime = { default-features = true, workspace = true }
+sp-core = { default-features = true, workspace = true }
 
 [features]
 default = ["std"]
@@ -36,7 +38,7 @@ std = [
 	"frame-support/std",
 	"frame-system/std",
 	"scale-info/std",
-]
+	]
 runtime-benchmarks = [
 	"frame-benchmarking/runtime-benchmarks",
 	"frame-support/runtime-benchmarks",

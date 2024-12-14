@@ -1,4 +1,4 @@
-# Kollectyve chain Node
+# Kollectyve Network chain node
 
 ### Build
 

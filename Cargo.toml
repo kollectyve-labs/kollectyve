@@ -8,14 +8,14 @@ edition = "2021"
 [workspace]
 members = [
     "node",
-    "pallets/kumulus-providers",
+    "pallets/kumulus",
     "runtime",
 ]
 resolver = "2"
 
 [workspace.dependencies]
 solochain-template-runtime = { path = "./runtime", default-features = false }
-kumulus-providers = { path = "./pallets/kumulus-providers", default-features = false }
+kumulus = { path = "./pallets/kumulus", default-features = false }
 clap = { version = "4.5.10" }
 frame-benchmarking-cli = { version = "43.0.0", default-features = false }
 frame-metadata-hash-extension = { version = "0.6.0", default-features = false }
@@ -72,3 +72,5 @@ sp-storage = { version = "21.0.0", default-features = false }
 sp-transaction-pool = { version = "34.0.0", default-features = false }
 sp-version = { version = "37.0.0", default-features = false }
 substrate-wasm-builder = { version = "24.0.1", default-features = false }
+sp-std = { version = "14.0.0", default-features = false }
+
