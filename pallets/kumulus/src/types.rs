@@ -2,12 +2,16 @@ use frame_support::pallet_prelude::*;
 use frame_support::BoundedVec;
 use scale_info::TypeInfo;
 
-pub type ResourceId = u32;
 pub type CountryCode = BoundedVec<u8, ConstU32<5>>;
-//pub type Location = BoundedVec<u8, ConstU32<99>>;
-//pub type Locations = BoundedVec<Location, ConstU32<7>>;
 pub type Website = BoundedVec<u8, ConstU32<99>>;
 pub type ProviderName = BoundedVec<u8, ConstU32<99>>;
+pub type ResourceId = u32;
+pub type StorageExtension = u64;
+pub type VCPUExtension = u8;
+pub const BASE_PRICE: u128 = 10_000_000_000;
+pub const BASE_MEMORY_GB: u32 = 2;
+pub const BASE_STORAGE_GB: u64 = 10;
+pub const BASE_VCPU: u8 = 2;
 
 #[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen)]
 pub enum BillingPeriod {
@@ -16,65 +20,76 @@ pub enum BillingPeriod {
 }
 
 #[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen)]
-pub enum ResourceCategory {
-    Basic,    // 1 CPU, 1GB RAM, 25GB Storage
-    Standard, // 2 CPU, 2GB RAM, 50GB Storage
-    Enhanced, // 4 CPU, 8GB RAM, 160GB Storage
-    Premium,  // 8 CPU, 16GB RAM, 320GB Storage
-}
-
-impl ResourceCategory {
-    // Get the specifications for this category
-    pub fn specs(&self) -> (u32, u32, u32) {
-        match self {
-            ResourceCategory::Basic => (1, 1, 25),
-            ResourceCategory::Standard => (2, 2, 50),
-            ResourceCategory::Enhanced => (4, 8, 160),
-            ResourceCategory::Premium => (8, 16, 320),
-        }
-    }
-
-    // Fixed monthly prices
-    pub fn price(&self, period: &BillingPeriod) -> u128 {
-        let monthly_price = match self {
-            ResourceCategory::Basic => 5_000_000_000,     // 5 tokens
-            ResourceCategory::Standard => 10_000_000_000, // 10 tokens
-            ResourceCategory::Enhanced => 20_000_000_000, // 20 tokens
-            ResourceCategory::Premium => 40_000_000_000,  // 40 tokens
-        };
-
-        match period {
-            BillingPeriod::Monthly => monthly_price,
-            BillingPeriod::Weekly => monthly_price / 4, // Divide by 4 for weekly price
-        }
-    }
-}
-
-#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen)]
 pub struct Resource<AccountId> {
     pub provider: AccountId,
     pub category: ResourceCategory,
-    pub location: ResourceLocation,
+    pub location: Region,
     pub is_available: bool,
-    pub provider_tier: ProviderTier,
     pub uptime_guarantee: u8, // Percentage of guaranteed uptime
 }
 
-#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen)]
-pub struct ResourceLocation {
-    pub region: Region,
-    // TODO: To update when mesures in place
-    // pub network_quality: NetworkQuality,
+#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen, Default)]
+pub struct CustomResourceSpecs {
+    pub vcpu: u8,
+    pub memory_gb: u32,
+    pub storage_gb: u64,
+    pub gpu_specs: Option<GPUSpecs>,
 }
 
-/// Average Latency (avg_latency_ms):  represents the time it takes for data to travel from one point to another in the network.
-/// Packet Loss Percent (packet_loss_percent): refers to the percentage of packets that fail to reach their destination.
-/// Jitter (jitter_ms): measures the variation in delay times for data packets being transmitted over a network.
+#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen, Default)]
+pub struct GPUSpecs {
+    pub gpu_count: u32,                          // Number of GPUs
+    pub gpu_memory_gb: Option<u32>,              // Memory per GPU in Gigabytes (optional)
+    pub gpu_model: BoundedVec<u8, ConstU32<99>>, // GPU model name
+}
+
 #[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen)]
-pub struct NetworkQuality {
-    pub avg_latency_ms: u32,
-    pub packet_loss_percent: u8,
-    pub jitter_ms: u32,
+pub enum ResourceCategory {
+    Nano(VCPUExtension, StorageExtension), // 2GB RAM, 10 GB Storage at least
+    Micro(VCPUExtension, StorageExtension), // 4GB RAM, 20GB Storage
+    Small(VCPUExtension, StorageExtension), // 8GB RAM, 8GB Storage
+    Medium(VCPUExtension, StorageExtension), // 16GB RAM, 160GB Storage
+    Large(VCPUExtension, StorageExtension), // 32GB RAM, 320GB Storage
+    Custom(CustomResourceSpecs),           // Custom specs
+}
+
+impl ResourceCategory {
+    pub fn price(&self) -> u128 {
+        // TODO: Complete the pricing model (as of now will be onchain based (storage,constant)
+        // without using runtime constant
+        BASE_PRICE
+    }
+
+    pub fn specs(&self) -> (u8, u32, u64) {
+        match self {
+            ResourceCategory::Nano(vcpu_ext, storage_ext) => (
+                BASE_VCPU + vcpu_ext,
+                BASE_MEMORY_GB,
+                BASE_STORAGE_GB + storage_ext,
+            ),
+            ResourceCategory::Micro(vcpu_ext, storage_ext) => (
+                BASE_VCPU + vcpu_ext,
+                BASE_MEMORY_GB * 2,
+                BASE_STORAGE_GB * 2 + storage_ext,
+            ),
+            ResourceCategory::Small(vcpu_ext, storage_ext) => (
+                (BASE_VCPU * 2) + vcpu_ext,
+                BASE_MEMORY_GB * 4,
+                BASE_STORAGE_GB * 4 + storage_ext,
+            ),
+            ResourceCategory::Medium(vcpu_ext, storage_ext) => (
+                (BASE_VCPU * 2) + vcpu_ext,
+                BASE_MEMORY_GB * 8,
+                BASE_STORAGE_GB * 8 + storage_ext,
+            ),
+            ResourceCategory::Large(vcpu_ext, storage_ext) => (
+                (BASE_VCPU * 4) + vcpu_ext,
+                BASE_MEMORY_GB * 16,
+                BASE_STORAGE_GB * 16 + storage_ext,
+            ),
+            ResourceCategory::Custom(specs) => (specs.vcpu, specs.memory_gb, specs.storage_gb),
+        }
+    }
 }
 
 #[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen)]
@@ -85,6 +100,12 @@ pub struct Rental<AccountId> {
     pub billing_period: BillingPeriod,
     pub last_paid_block: u32,
     pub is_active: bool,
+}
+
+#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen)]
+pub struct Region {
+    pub country_code: CountryCode,
+    pub city: BoundedVec<u8, ConstU32<32>>,
 }
 
 #[derive(Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen)]
@@ -105,77 +126,4 @@ pub enum ProviderStatus {
     Inactive,
     Suspended,
     Terminated,
-}
-
-impl Default for ProviderStatus {
-    fn default() -> Self {
-        Self::Active
-    }
-}
-
-#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen)]
-pub enum ProviderTier {
-    Mobile {
-        device_type: DeviceType,
-        is_cluster: bool,
-        cluster_size: Option<u16>,
-    },
-    Personal {
-        computer_type: ComputerType,
-        is_cluster: bool,
-        cluster_size: Option<u16>,
-    },
-    DataCenter {
-        tier_level: DataCenterTier,
-        rack_count: u16,
-    },
-}
-
-#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen)]
-pub enum DeviceType {
-    Smartphone,
-    Tablet,
-    EdgeDevice,
-    Custom(BoundedVec<u8, ConstU32<32>>), // For future device types
-}
-
-#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen)]
-pub enum ComputerType {
-    Desktop,
-    Workstation,
-    Server,
-    Custom(BoundedVec<u8, ConstU32<32>>), // For future computer types
-}
-
-#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen)]
-pub enum DataCenterTier {
-    Tier1, // Basic
-    Tier2, // Redundant Components
-    Tier3, // Concurrently Maintainable
-    Tier4, // Fault Tolerant
-}
-
-#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen)]
-pub struct Region {
-    pub country_code: CountryCode,
-    pub city: BoundedVec<u8, ConstU32<32>>,
-    pub coordinates: Option<Coordinates>,
-    pub connection_type: ConnectionType,
-    pub power_backup: bool,
-}
-
-#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen)]
-pub struct Coordinates {
-    pub latitude: i32,  // Multiplied by 1_000_000 to avoid floats
-    pub longitude: i32, // Multiplied by 1_000_000 to avoid floats
-}
-
-#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen)]
-pub enum ConnectionType {
-    Fiber { speed_mbps: u32 },
-    Broadband { speed_mbps: u32 },
-    Mobile4G { speed_mbps: u32 },
-    Mobile5G { speed_mbps: u32 },
-    Satellite { latency_ms: u32 },
-    Other { speed_mbps: u32 },
 }

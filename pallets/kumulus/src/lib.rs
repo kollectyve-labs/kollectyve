@@ -240,66 +240,68 @@ pub mod pallet {
         ) -> DispatchResult {
             let renter = ensure_signed(origin)?;
 
-            let resource = Resources::<T>::get(resource_id).ok_or(Error::<T>::ResourceNotFound)?;
-            ensure!(resource.is_available, Error::<T>::ResourceNotAvailable);
+            /*
+             let resource = Resources::<T>::get(resource_id).ok_or(Error::<T>::ResourceNotFound)?;
+             ensure!(resource.is_available, Error::<T>::ResourceNotAvailable);
 
-            // Calculate required deposit (2 billing periods worth)
-            let period_cost = resource.category.price(&billing_period);
+             // Calculate required deposit (2 billing periods worth)
+            // let period_cost = resource.category.price(&billing_period);
 
-            let deposit_amount: BalanceOf<T> = (period_cost * 2)
-                .try_into()
-                .map_err(|_| Error::<T>::ConversionError)?;
+             let deposit_amount: BalanceOf<T> = (period_cost * 2)
+                 .try_into()
+                 .map_err(|_| Error::<T>::ConversionError)?;
 
-            ensure!(
-                deposit_amount >= T::MinimumDeposit::get(),
-                Error::<T>::InsufficientDeposit
-            );
 
-            // Transfer deposit to escrow account
-            let escrow_account = Self::escrow_account();
+             ensure!(
+                 deposit_amount >= T::MinimumDeposit::get(),
+                 Error::<T>::InsufficientDeposit
+             );
 
-            T::Currency::transfer(
-                &renter,
-                &escrow_account,
-                deposit_amount,
-                ExistenceRequirement::KeepAlive,
-            )?;
+             // Transfer deposit to escrow account
+             let escrow_account = Self::escrow_account();
 
-            // Store deposit
-            Deposits::<T>::insert(resource_id, deposit_amount);
+             T::Currency::transfer(
+                 &renter,
+                 &escrow_account,
+                 deposit_amount,
+                 ExistenceRequirement::KeepAlive,
+             )?;
 
-            // Create rental record
-            let current_block = frame_system::Pallet::<T>::block_number();
+             // Store deposit
+             Deposits::<T>::insert(resource_id, deposit_amount);
 
-            let current_block_u32: u32 = current_block
-                .try_into()
-                .map_err(|_| Error::<T>::BlockNumberOverflow)?;
+             // Create rental record
+             let current_block = frame_system::Pallet::<T>::block_number();
 
-            let rental = Rental {
-                resource_id,
-                renter: renter.clone(),
-                start_block: current_block_u32,
-                billing_period,
-                last_paid_block: current_block_u32,
-                is_active: true,
-            };
+             let current_block_u32: u32 = current_block
+                 .try_into()
+                 .map_err(|_| Error::<T>::BlockNumberOverflow)?;
 
-            // Update resource and store rental
-            Resources::<T>::insert(
-                resource_id,
-                Resource {
-                    is_available: false,
-                    ..resource
-                },
-            );
+             let rental = Rental {
+                 resource_id,
+                 renter: renter.clone(),
+                 start_block: current_block_u32,
+                 billing_period,
+                 last_paid_block: current_block_u32,
+                 is_active: true,
+             };
 
-            Rentals::<T>::insert(resource_id, rental);
+             // Update resource and store rental
+             Resources::<T>::insert(
+                 resource_id,
+                 Resource {
+                     is_available: false,
+                     ..resource
+                 },
+             );
 
-            Self::deposit_event(Event::ResourceRented {
-                resource_id,
-                renter,
-            });
+             Rentals::<T>::insert(resource_id, rental);
 
+             Self::deposit_event(Event::ResourceRented {
+                 resource_id,
+                 renter,
+             });
+             */
             Ok(())
         }
 
@@ -308,6 +310,7 @@ pub mod pallet {
         pub fn cancel_rental(origin: OriginFor<T>, resource_id: u32) -> DispatchResult {
             let renter = ensure_signed(origin)?;
 
+            /*
             let rental = Rentals::<T>::get(resource_id).ok_or(Error::<T>::RentalNotFound)?;
             ensure!(rental.renter == renter, Error::<T>::NotRenter);
 
@@ -324,6 +327,7 @@ pub mod pallet {
                 BillingPeriod::Weekly => T::BlocksPerWeek::get(),
                 BillingPeriod::Monthly => T::BlocksPerWeek::get() * 4,
             };
+
 
             let period_cost = resource.category.price(&rental.billing_period);
 
@@ -363,7 +367,7 @@ pub mod pallet {
                 resource_id,
                 renter,
             });
-
+            */
             Ok(())
         }
 
@@ -371,6 +375,8 @@ pub mod pallet {
         #[pallet::weight({10000})]
         pub fn claim_payment(origin: OriginFor<T>, resource_id: u32) -> DispatchResult {
             let provider = ensure_signed(origin)?;
+
+            /*
 
             // Get the resource and verify ownership
             let resource = Resources::<T>::get(resource_id).ok_or(Error::<T>::ResourceNotFound)?;
@@ -438,7 +444,7 @@ pub mod pallet {
                 provider,
                 amount: payment_amount,
             });
-
+            */
             Ok(())
         }
     }
