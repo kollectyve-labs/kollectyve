@@ -157,7 +157,7 @@ pub mod pallet {
                 reputation_score: Default::default(),
                 registration_block: current_block_u32,
                 last_updated: current_block_u32,
-                status: ProviderStatus::Active,
+                status: ProviderStatus::Inactive,
             };
 
             Providers::<T>::insert(&who, provider_info);
@@ -235,82 +235,79 @@ pub mod pallet {
         #[pallet::weight({20000})]
         pub fn rent_resource(
             origin: OriginFor<T>,
-            resource_id: u32,
+            resource_id: ResourceId,
             billing_period: BillingPeriod,
         ) -> DispatchResult {
             let renter = ensure_signed(origin)?;
 
-            /*
-             let resource = Resources::<T>::get(resource_id).ok_or(Error::<T>::ResourceNotFound)?;
-             ensure!(resource.is_available, Error::<T>::ResourceNotAvailable);
+            let resource = Resources::<T>::get(resource_id).ok_or(Error::<T>::ResourceNotFound)?;
+            ensure!(resource.is_available, Error::<T>::ResourceNotAvailable);
 
-             // Calculate required deposit (2 billing periods worth)
-            // let period_cost = resource.category.price(&billing_period);
+            // Calculate required deposit (2 billing periods worth)
+            let period_cost = resource.category.price(&billing_period);
 
-             let deposit_amount: BalanceOf<T> = (period_cost * 2)
-                 .try_into()
-                 .map_err(|_| Error::<T>::ConversionError)?;
+            let deposit_amount: BalanceOf<T> = (period_cost * 2)
+                .try_into()
+                .map_err(|_| Error::<T>::ConversionError)?;
 
+            ensure!(
+                deposit_amount >= T::MinimumDeposit::get(),
+                Error::<T>::InsufficientDeposit
+            );
 
-             ensure!(
-                 deposit_amount >= T::MinimumDeposit::get(),
-                 Error::<T>::InsufficientDeposit
-             );
+            // Transfer deposit to escrow account
+            let escrow_account = Self::escrow_account();
 
-             // Transfer deposit to escrow account
-             let escrow_account = Self::escrow_account();
+            T::Currency::transfer(
+                &renter,
+                &escrow_account,
+                deposit_amount,
+                ExistenceRequirement::KeepAlive,
+            )?;
 
-             T::Currency::transfer(
-                 &renter,
-                 &escrow_account,
-                 deposit_amount,
-                 ExistenceRequirement::KeepAlive,
-             )?;
+            // Store deposit
+            Deposits::<T>::insert(resource_id, deposit_amount);
 
-             // Store deposit
-             Deposits::<T>::insert(resource_id, deposit_amount);
+            // Create rental record
+            let current_block = frame_system::Pallet::<T>::block_number();
 
-             // Create rental record
-             let current_block = frame_system::Pallet::<T>::block_number();
+            let current_block_u32: u32 = current_block
+                .try_into()
+                .map_err(|_| Error::<T>::BlockNumberOverflow)?;
 
-             let current_block_u32: u32 = current_block
-                 .try_into()
-                 .map_err(|_| Error::<T>::BlockNumberOverflow)?;
+            let rental = Rental {
+                resource_id,
+                renter: renter.clone(),
+                start_block: current_block_u32,
+                billing_period,
+                last_paid_block: current_block_u32,
+                is_active: true,
+            };
 
-             let rental = Rental {
-                 resource_id,
-                 renter: renter.clone(),
-                 start_block: current_block_u32,
-                 billing_period,
-                 last_paid_block: current_block_u32,
-                 is_active: true,
-             };
+            // Update resource and store rental
+            Resources::<T>::insert(
+                resource_id,
+                Resource {
+                    is_available: false,
+                    ..resource
+                },
+            );
 
-             // Update resource and store rental
-             Resources::<T>::insert(
-                 resource_id,
-                 Resource {
-                     is_available: false,
-                     ..resource
-                 },
-             );
+            Rentals::<T>::insert(resource_id, rental);
 
-             Rentals::<T>::insert(resource_id, rental);
+            Self::deposit_event(Event::ResourceRented {
+                resource_id,
+                renter,
+            });
 
-             Self::deposit_event(Event::ResourceRented {
-                 resource_id,
-                 renter,
-             });
-             */
             Ok(())
         }
 
         #[pallet::call_index(5)]
         #[pallet::weight({10000})]
-        pub fn cancel_rental(origin: OriginFor<T>, resource_id: u32) -> DispatchResult {
+        pub fn cancel_rental(origin: OriginFor<T>, resource_id: ResourceId) -> DispatchResult {
             let renter = ensure_signed(origin)?;
 
-            /*
             let rental = Rentals::<T>::get(resource_id).ok_or(Error::<T>::RentalNotFound)?;
             ensure!(rental.renter == renter, Error::<T>::NotRenter);
 
@@ -327,7 +324,6 @@ pub mod pallet {
                 BillingPeriod::Weekly => T::BlocksPerWeek::get(),
                 BillingPeriod::Monthly => T::BlocksPerWeek::get() * 4,
             };
-
 
             let period_cost = resource.category.price(&rental.billing_period);
 
@@ -367,16 +363,14 @@ pub mod pallet {
                 resource_id,
                 renter,
             });
-            */
+
             Ok(())
         }
 
         #[pallet::call_index(6)]
         #[pallet::weight({10000})]
-        pub fn claim_payment(origin: OriginFor<T>, resource_id: u32) -> DispatchResult {
+        pub fn claim_payment(origin: OriginFor<T>, resource_id: ResourceId) -> DispatchResult {
             let provider = ensure_signed(origin)?;
-
-            /*
 
             // Get the resource and verify ownership
             let resource = Resources::<T>::get(resource_id).ok_or(Error::<T>::ResourceNotFound)?;
@@ -444,7 +438,7 @@ pub mod pallet {
                 provider,
                 amount: payment_amount,
             });
-            */
+
             Ok(())
         }
     }

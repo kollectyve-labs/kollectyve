@@ -8,7 +8,7 @@ pub type ProviderName = BoundedVec<u8, ConstU32<99>>;
 pub type ResourceId = u32;
 pub type StorageExtension = u64;
 pub type VCPUExtension = u8;
-pub const BASE_PRICE: u128 = 10_000_000_000;
+pub const BASE_PRICE: u128 = 10_000_000_000; // for 1 week
 pub const BASE_MEMORY_GB: u32 = 2;
 pub const BASE_STORAGE_GB: u64 = 10;
 pub const BASE_VCPU: u8 = 2;
@@ -54,10 +54,13 @@ pub enum ResourceCategory {
 }
 
 impl ResourceCategory {
-    pub fn price(&self) -> u128 {
+    pub fn price(&self, billing_period: &BillingPeriod) -> u128 {
         // TODO: Complete the pricing model (as of now will be onchain based (storage,constant)
         // without using runtime constant
-        BASE_PRICE
+        match billing_period {
+            BillingPeriod::Weekly => BASE_PRICE,
+            BillingPeriod::Monthly => BASE_PRICE * 4,
+        }
     }
 
     pub fn specs(&self) -> (u8, u32, u64) {
