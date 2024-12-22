@@ -122,7 +122,7 @@ pub mod pallet {
     #[pallet::call]
     impl<T: Config> Pallet<T> {
         #[pallet::call_index(0)]
-        #[pallet::weight({20000})]
+        #[pallet::weight(Weight::default())]
         pub fn register_provider(
             origin: OriginFor<T>,
             name: ProviderName,
@@ -168,7 +168,7 @@ pub mod pallet {
         }
 
         #[pallet::call_index(1)]
-        #[pallet::weight({15000})]
+        #[pallet::weight(Weight::default())]
         pub fn update_provider_status(
             origin: OriginFor<T>,
             status: ProviderStatus,
@@ -200,7 +200,7 @@ pub mod pallet {
         }
 
         #[pallet::call_index(3)]
-        #[pallet::weight({20000})]
+        #[pallet::weight(Weight::default())]
         pub fn register_resource(
             origin: OriginFor<T>,
             resource: Resource<T::AccountId>,
@@ -232,7 +232,7 @@ pub mod pallet {
         }
 
         #[pallet::call_index(4)]
-        #[pallet::weight({20000})]
+        #[pallet::weight(Weight::default())]
         pub fn rent_resource(
             origin: OriginFor<T>,
             resource_id: ResourceId,
@@ -304,7 +304,7 @@ pub mod pallet {
         }
 
         #[pallet::call_index(5)]
-        #[pallet::weight({10000})]
+        #[pallet::weight(Weight::default())]
         pub fn cancel_rental(origin: OriginFor<T>, resource_id: ResourceId) -> DispatchResult {
             let renter = ensure_signed(origin)?;
 
@@ -368,7 +368,7 @@ pub mod pallet {
         }
 
         #[pallet::call_index(6)]
-        #[pallet::weight({10000})]
+        #[pallet::weight(Weight::default())]
         pub fn claim_payment(origin: OriginFor<T>, resource_id: ResourceId) -> DispatchResult {
             let provider = ensure_signed(origin)?;
 
