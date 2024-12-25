@@ -14,11 +14,11 @@ After you build the project, you can use the following command to explore its
 parameters and subcommands:
 
 ```sh
-./target/release/solochain-template-node -h
+./target/release/kollectyve-node -h
 ```
 
 You can generate and view the [Rust
-Docs](https://doc.rust-lang.org/cargo/commands/cargo-doc.html) for this template
+Docs](https://doc.rust-lang.org/cargo/commands/cargo-doc.html) for the chain
 with this command:
 
 ```sh
@@ -31,17 +31,17 @@ The following command starts a single-node development chain that doesn't
 persist state:
 
 ```sh
-./target/release/solochain-template-node --dev
+./target/release/kollectyve-node --dev
 ```
 
 To purge the development chain's state, run the following command:
 
 ```sh
-./target/release/solochain-template-node purge-chain --dev
+./target/release/kollectyve-node purge-chain --dev
 ```
 
 To start the development chain with detailed logging, run the following command:
 
 ```sh
-RUST_BACKTRACE=1 ./target/release/solochain-template-node -ldebug --dev
+RUST_BACKTRACE=1 ./target/release/kollectyve-node -ldebug --dev
 ```

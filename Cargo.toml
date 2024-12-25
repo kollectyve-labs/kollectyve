@@ -1,8 +1,8 @@
 [workspace.package]
 license = "MIT-0"
-authors = ["Parity Technologies <admin@parity.io>"]
-homepage = "https://paritytech.github.io/polkadot-sdk/"
-repository = "https://github.com/paritytech/polkadot-sdk-solochain-template.git"
+authors = ["Kollectyve Labs <hello@kollectyve.network>"]
+homepage = "https://kollectyve.network"
+repository = "https://github.com/kollectyve-labs/kollectyve.git"
 edition = "2021"
 
 [workspace]

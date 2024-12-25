@@ -1,6 +1,6 @@
 [package]
-name = "solochain-template-node"
-description = "A solochain node template built with Substrate, part of Polkadot Sdk."
+name = "kollectyve-node"
+description = "Kollectyve Network Node."
 version = "0.1.0"
 license = "Unlicense"
 authors.workspace = true
