@@ -1,4 +1,4 @@
-//! Substrate Node Template CLI library.
+//! Kollectyve Node CLI.
 #![warn(missing_docs)]
 
 mod benchmarking;

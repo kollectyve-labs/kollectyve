@@ -111,7 +111,7 @@ pub struct Region {
     pub city: BoundedVec<u8, ConstU32<32>>,
 }
 
-#[derive(Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen)]
+#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen)]
 pub struct ProviderInfo<AccountId> {
     pub account: AccountId,
     pub name: ProviderName,       // Provider's name/organization
@@ -130,3 +130,16 @@ pub enum ProviderStatus {
     Suspended,
     Terminated,
 }
+
+#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen)]
+pub struct BootstrapperInfo<AccountId> {
+    pub bootstrapper_info: AccountId,
+    pub bootstrap_type: BootstrapperType,
+}
+
+#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen, Copy)]
+pub enum BootstrapperType {
+    Kollectyve,
+    Else,
+}
+
