@@ -26,7 +26,7 @@
 // Substrate and Polkadot dependencies
 use frame_support::{
     derive_impl, parameter_types,
-    traits::{ConstBool, ConstU128, ConstU32, ConstU64, ConstU8, VariantCountOf},
+    traits::{ConstBool, ConstU128, ConstU32, ConstU64, ConstU8, VariantCountOf, AsEnsureOriginWithArg},
     weights::{
         constants::{RocksDbWeight, WEIGHT_REF_TIME_PER_SECOND},
         IdentityFee, Weight,
@@ -36,7 +36,7 @@ use frame_support::{
 use frame_system::limits::{BlockLength, BlockWeights};
 use pallet_transaction_payment::{ConstFeeMultiplier, FungibleAdapter, Multiplier};
 use sp_consensus_aura::sr25519::AuthorityId as AuraId;
-use sp_runtime::{traits::One, Perbill};
+use sp_runtime::{traits::{One, Verify}, Perbill, MultiSignature};
 use sp_version::RuntimeVersion;
 
 // Local module imports
@@ -45,6 +45,8 @@ use super::{
     RuntimeCall, RuntimeEvent, RuntimeFreezeReason, RuntimeHoldReason, RuntimeOrigin, RuntimeTask,
     System, EXISTENTIAL_DEPOSIT, SLOT_DURATION, VERSION,
 };
+
+use pallet_nfts::PalletFeatures;
 
 const NORMAL_DISPATCH_RATIO: Perbill = Perbill::from_percent(75);
 
@@ -170,4 +172,40 @@ impl kumulus::Config for Runtime {
     type PalletId = KumulusPalletId;
     type MinimumDeposit = MinimumDeposit;
     //type WeightInfo = kumulus::weights::SubstrateWeight<Runtime>;
+}
+
+parameter_types! {
+	pub storage Features: PalletFeatures = PalletFeatures::all_enabled();
+}
+
+pub type Signature = MultiSignature;
+pub type AccountPublic = <Signature as Verify>::Signer;
+
+impl pallet_nfts::Config for Runtime {
+   type RuntimeEvent = RuntimeEvent;
+   type CollectionId = u32;
+   type ItemId = u32;
+   type Currency = Balances;
+   type CreateOrigin = AsEnsureOriginWithArg<frame_system::EnsureSigned<Self::AccountId>>;
+   type ForceOrigin = frame_system::EnsureRoot<Self::AccountId>;
+   type Locker = ();
+   type CollectionDeposit = ConstU128<2>;
+   type ItemDeposit = ConstU128<1>;
+   type MetadataDepositBase = ConstU128<1>;
+   type AttributeDepositBase = ConstU128<1>;
+   type DepositPerByte = ConstU128<1>;
+   type StringLimit = ConstU32<50>;
+   type KeyLimit = ConstU32<50>;
+   type ValueLimit = ConstU32<50>;
+   type ApprovalsLimit = ConstU32<10>;
+   type ItemAttributesApprovalsLimit = ConstU32<2>;
+   type MaxTips = ConstU32<10>;
+   type MaxDeadlineDuration = ConstU32<10000>;
+   type MaxAttributesPerCall = ConstU32<2>;
+   type Features = Features;
+    /// It needs to be From<MultiSignature> for benchmarking.
+    type OffchainSignature = Signature;
+    type OffchainPublic = AccountPublic;
+    type WeightInfo = ();
+
 }

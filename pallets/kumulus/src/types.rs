@@ -142,4 +142,3 @@ pub enum BootstrapperType {
     Kollectyve,
     Else,
 }
-

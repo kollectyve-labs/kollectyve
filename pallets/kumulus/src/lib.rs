@@ -70,30 +70,24 @@ pub mod pallet {
     >;
 
     //TODO: Add Bootstrapers : resources that are almost always available and for devnet phase
-        
+
     #[pallet::storage]
-    pub(super) type Bootstrappers<T: Config> = StorageMap<
-        _,
-        Blake2_128Concat,
-        T::AccountId,
-        BootstrapperInfo<T::AccountId>,
-        OptionQuery
-    >;
+    pub(super) type Bootstrappers<T: Config> =
+        StorageMap<_, Blake2_128Concat, T::AccountId, BootstrapperInfo<T::AccountId>, OptionQuery>;
 
     #[pallet::storage]
     pub(super) type BootstrappedResources<T: Config> = StorageDoubleMap<
         _,
         Blake2_128Concat,
-        T::AccountId,      // Bootstrapper account
+        T::AccountId, // Bootstrapper account
         Blake2_128Concat,
-        ResourceId,        // Resource ID
+        ResourceId, // Resource ID
         Resource<T::AccountId>,
-        OptionQuery
+        OptionQuery,
     >;
 
     #[pallet::storage]
     pub(super) type NextBootstrappedResourceId<T: Config> = StorageValue<_, ResourceId, ValueQuery>;
-
 
     #[pallet::storage]
     pub type Deposits<T: Config> =
@@ -130,7 +124,7 @@ pub mod pallet {
             who: T::AccountId,
             bootstrap_type: BootstrapperType,
         },
-        
+
         BootstrapperRemoved {
             who: T::AccountId,
         },
@@ -159,8 +153,7 @@ pub mod pallet {
         BootstrapperExpired,
         UptimeTooLow,
         ResourceIdOverflow,
-        BootstrapperAlreadyRegistered
-
+        BootstrapperAlreadyRegistered,
     }
 
     #[pallet::call]
@@ -485,7 +478,7 @@ pub mod pallet {
 
             Ok(())
         }
-    
+
         #[pallet::call_index(7)]
         #[pallet::weight(Weight::default())]
         pub fn add_bootstrapper(
@@ -500,22 +493,22 @@ pub mod pallet {
                 !Bootstrappers::<T>::contains_key(&account),
                 Error::<T>::BootstrapperAlreadyRegistered
             );
-                
+
             let bootstrapper_info = BootstrapperInfo {
                 bootstrapper_info: account.clone(),
-                bootstrap_type
+                bootstrap_type,
             };
-            
+
             Bootstrappers::<T>::insert(&account, bootstrapper_info);
-            
+
             Self::deposit_event(Event::BootstrapperAdded {
                 who: account,
                 bootstrap_type,
             });
-            
+
             Ok(())
         }
-        
+
         #[pallet::call_index(8)]
         #[pallet::weight(Weight::default())]
         pub fn register_bootstrapped_resource(
@@ -523,13 +516,13 @@ pub mod pallet {
             resource: Resource<T::AccountId>,
         ) -> DispatchResult {
             let bootstrapper = ensure_signed(origin)?;
-            
+
             // Check if bootstrapper exists and is valid
             ensure!(
                 Bootstrappers::<T>::contains_key(&bootstrapper),
                 Error::<T>::NotBootstrapper
             );
-                
+
             // Get new bootstrapped resource IDs
             let bootstrapped_id = NextBootstrappedResourceId::<T>::get();
 
@@ -537,12 +530,12 @@ pub mod pallet {
             BootstrappedResources::<T>::insert(bootstrapper.clone(), bootstrapped_id, resource);
 
             NextBootstrappedResourceId::<T>::put(bootstrapped_id + 1);
-             
+
             Self::deposit_event(Event::BootstrappedResourceAdded {
                 bootstrapped_id,
                 bootstrapper,
             });
-            
+
             Ok(())
         }
     }

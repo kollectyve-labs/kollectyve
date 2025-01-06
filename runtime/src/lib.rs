@@ -223,4 +223,8 @@ mod runtime {
 
     #[runtime::pallet_index(7)]
     pub type KumulusModule = kumulus;
+
+    #[runtime::pallet_index(8)]
+    pub type NFTModule = pallet_nfts;
+
 }
