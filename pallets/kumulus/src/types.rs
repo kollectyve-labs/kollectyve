@@ -13,13 +13,13 @@ pub const BASE_MEMORY_GB: u32 = 2;
 pub const BASE_STORAGE_GB: u64 = 10;
 pub const BASE_VCPU: u8 = 2;
 
-#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen)]
+#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen, DecodeWithMemTracking)]
 pub enum BillingPeriod {
     Weekly,
     Monthly,
 }
 
-#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen)]
+#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen, DecodeWithMemTracking)]
 pub struct Resource<AccountId> {
     pub provider: AccountId,
     pub category: ResourceCategory,
@@ -28,7 +28,7 @@ pub struct Resource<AccountId> {
     pub uptime_guarantee: u8, // Percentage of guaranteed uptime
 }
 
-#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen, Default)]
+#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen, Default, DecodeWithMemTracking)]
 pub struct CustomResourceSpecs {
     pub vcpu: u8,
     pub memory_gb: u32,
@@ -36,14 +36,14 @@ pub struct CustomResourceSpecs {
     pub gpu_specs: Option<GPUSpecs>,
 }
 
-#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen, Default)]
+#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen, Default, DecodeWithMemTracking)]
 pub struct GPUSpecs {
     pub gpu_count: u32,                          // Number of GPUs
     pub gpu_memory_gb: Option<u32>,              // Memory per GPU in Gigabytes (optional)
     pub gpu_model: BoundedVec<u8, ConstU32<99>>, // GPU model name
 }
 
-#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen)]
+#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen, DecodeWithMemTracking)]
 pub enum ResourceCategory {
     Nano(VCPUExtension, StorageExtension), // 2GB RAM, 10 GB Storage at least
     Micro(VCPUExtension, StorageExtension), // 4GB RAM, 20GB Storage
@@ -95,7 +95,7 @@ impl ResourceCategory {
     }
 }
 
-#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen)]
+#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen, DecodeWithMemTracking)]
 pub struct Rental<AccountId> {
     pub resource_id: ResourceId,
     pub renter: AccountId,
@@ -105,13 +105,13 @@ pub struct Rental<AccountId> {
     pub is_active: bool,
 }
 
-#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen)]
+#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen, DecodeWithMemTracking)]
 pub struct Region {
     pub country_code: CountryCode,
     pub city: BoundedVec<u8, ConstU32<32>>,
 }
 
-#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen)]
+#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen, DecodeWithMemTracking)]
 pub struct ProviderInfo<AccountId> {
     pub account: AccountId,
     pub name: ProviderName,       // Provider's name/organization
@@ -123,7 +123,7 @@ pub struct ProviderInfo<AccountId> {
     pub status: ProviderStatus,   // Current status
 }
 
-#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen)]
+#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen, DecodeWithMemTracking)]
 pub enum ProviderStatus {
     Active,
     Inactive,
@@ -131,13 +131,13 @@ pub enum ProviderStatus {
     Terminated,
 }
 
-#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen)]
+#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen, DecodeWithMemTracking)]
 pub struct BootstrapperInfo<AccountId> {
     pub bootstrapper_info: AccountId,
     pub bootstrap_type: BootstrapperType,
 }
 
-#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen, Copy)]
+#[derive(Clone, Encode, Decode, PartialEq, RuntimeDebug, TypeInfo, MaxEncodedLen, Copy, DecodeWithMemTracking)]
 pub enum BootstrapperType {
     Kollectyve,
     Else,
