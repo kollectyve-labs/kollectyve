@@ -6,9 +6,10 @@ repository = "https://github.com/paritytech/polkadot-sdk-parachain-template.git"
 edition = "2021"
 
 [workspace]
-default-members = ["pallets/template", "runtime"]
+default-members = [
+    "pallets/template", "pallets/kumulus-bootstrap", "runtime"]
 members = [
-    "node",
+    "node", "pallets/kumulus-bootstrap",
     "pallets/template",
     "runtime",
 ]
@@ -17,6 +18,8 @@ resolver = "2"
 [workspace.dependencies]
 parachain-template-runtime = { path = "./runtime", default-features = false }
 pallet-parachain-template = { path = "./pallets/template", default-features = false }
+pallet-kumulus-bootstrap = { path = "./pallets/kumulus-bootstrap", default-features = false }
+
 clap = { version = "4.5.13" }
 codec = { version = "3.6.12", default-features = false, package = "parity-scale-codec" }
 color-print = { version = "0.3.4" }

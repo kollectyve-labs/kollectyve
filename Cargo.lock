@@ -8624,6 +8624,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "pallet-kumulus-bootstrap"
+version = "0.1.0"
+dependencies = [
+ "parity-scale-codec",
+ "polkadot-sdk-frame",
+ "scale-info",
+]
+
+[[package]]
 name = "pallet-lottery"
 version = "39.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -9658,6 +9667,7 @@ dependencies = [
  "docify",
  "hex-literal",
  "log",
+ "pallet-kumulus-bootstrap",
  "pallet-parachain-template",
  "parity-scale-codec",
  "polkadot-sdk",
