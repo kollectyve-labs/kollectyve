@@ -6134,6 +6134,42 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c33070833c9ee02266356de0c43f723152bd38bd96ddf52c82b3af10c9138b28"
 
 [[package]]
+name = "kollectyve-node"
+version = "0.1.0"
+dependencies = [
+ "clap",
+ "color-print",
+ "docify",
+ "futures",
+ "jsonrpsee 0.24.9",
+ "kollectyve-runtime",
+ "log",
+ "parity-scale-codec",
+ "polkadot-sdk",
+ "sc-tracing",
+ "serde",
+ "serde_json",
+ "substrate-prometheus-endpoint",
+]
+
+[[package]]
+name = "kollectyve-runtime"
+version = "0.1.0"
+dependencies = [
+ "cumulus-pallet-parachain-system",
+ "docify",
+ "hex-literal",
+ "log",
+ "pallet-kumulus-bootstrap",
+ "parity-scale-codec",
+ "polkadot-sdk",
+ "scale-info",
+ "serde_json",
+ "smallvec",
+ "substrate-wasm-builder",
+]
+
+[[package]]
 name = "kvdb"
 version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -9638,43 +9674,6 @@ dependencies = [
  "sp-std",
  "staging-xcm",
  "staging-xcm-builder",
-]
-
-[[package]]
-name = "parachain-template-node"
-version = "0.1.0"
-dependencies = [
- "clap",
- "color-print",
- "docify",
- "futures",
- "jsonrpsee 0.24.9",
- "log",
- "parachain-template-runtime",
- "parity-scale-codec",
- "polkadot-sdk",
- "sc-tracing",
- "serde",
- "serde_json",
- "substrate-prometheus-endpoint",
-]
-
-[[package]]
-name = "parachain-template-runtime"
-version = "0.1.0"
-dependencies = [
- "cumulus-pallet-parachain-system",
- "docify",
- "hex-literal",
- "log",
- "pallet-kumulus-bootstrap",
- "pallet-parachain-template",
- "parity-scale-codec",
- "polkadot-sdk",
- "scale-info",
- "serde_json",
- "smallvec",
- "substrate-wasm-builder",
 ]
 
 [[package]]

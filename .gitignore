@@ -1,1 +1,4 @@
 target/
+data/
+plain_chain_spec.json
+chain_spec.json

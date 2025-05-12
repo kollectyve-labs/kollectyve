@@ -1,8 +1,8 @@
 [workspace.package]
 license = "MIT-0"
-authors = ["Parity Technologies <admin@parity.io>"]
-homepage = "https://paritytech.github.io/polkadot-sdk/"
-repository = "https://github.com/paritytech/polkadot-sdk-parachain-template.git"
+authors = ["Kollectyve Labs <hello@kollectvye.network>"]
+homepage = "https://kollectyve.network"
+repository = "https://github.com/kollectyve-labs/kollectyve.git"
 edition = "2021"
 
 [workspace]
@@ -16,8 +16,7 @@ members = [
 resolver = "2"
 
 [workspace.dependencies]
-parachain-template-runtime = { path = "./runtime", default-features = false }
-pallet-parachain-template = { path = "./pallets/template", default-features = false }
+kollectyve-runtime = { path = "./runtime", default-features = false }
 pallet-kumulus-bootstrap = { path = "./pallets/kumulus-bootstrap", default-features = false }
 
 clap = { version = "4.5.13" }

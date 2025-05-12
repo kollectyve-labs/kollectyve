@@ -9,3 +9,8 @@ Use the following command to build the node without launching it:
 cargo build --release --locked
 ```
 
+### Run
+
+```sh
+polkadot-omni-node --chain ./chain_spec.json --dev
+```
