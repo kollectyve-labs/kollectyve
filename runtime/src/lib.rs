@@ -309,6 +309,9 @@ mod runtime {
 
     #[runtime::pallet_index(51)]
     pub type KumulusBootstrap = pallet_kumulus_bootstrap;
+
+    #[runtime::pallet_index(52)]
+    pub type Assets = pallet_assets;
 }
 
 #[docify::export(register_validate_block)]

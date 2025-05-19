@@ -38,13 +38,14 @@ use frame_support::{
     parameter_types,
     traits::{
         ConstBool, ConstU32, ConstU64, ConstU8, EitherOfDiverse, TransformOrigin, VariantCountOf,
+        AsEnsureOriginWithArg,
     },
     weights::{ConstantMultiplier, Weight},
     PalletId,
 };
 use frame_system::{
     limits::{BlockLength, BlockWeights},
-    EnsureRoot,
+    EnsureRoot, EnsureSigned
 };
 use pallet_xcm::{EnsureXcm, IsVoiceOfBody};
 use parachains_common::message_queue::{NarrowOriginToSibling, ParaIdToSibling};
@@ -66,6 +67,9 @@ use super::{
     MAXIMUM_BLOCK_WEIGHT, MICRO_UNIT, NORMAL_DISPATCH_RATIO, SLOT_DURATION, VERSION,
 };
 use xcm_config::{RelayLocation, XcmOriginToTransactDispatchOrigin};
+
+//use crate::polkadot_sdk_frame::traits::AsEnsureOriginWithArg;   |
+//use crate::polkadot_sdk_frame::runtime::prelude::EnsureSigned;
 
 parameter_types! {
     pub const Version: RuntimeVersion = VERSION;
@@ -310,9 +314,40 @@ impl pallet_collator_selection::Config for Runtime {
     type WeightInfo = ();
 }
 
-
 /// Configure the pallet template in pallets/template.
 impl pallet_kumulus_bootstrap::Config for Runtime {
     type RuntimeEvent = RuntimeEvent;
     type WeightInfo = pallet_kumulus_bootstrap::weights::SubstrateWeight<Runtime>;
+}
+
+pub const UNIT: u128 = 1_000_000_000;
+parameter_types! {
+    pub const AssetDeposit: Balance = 100 * UNIT;
+    pub const AssetAccountDeposit: Balance = UNIT;
+    pub const MetadataDepositBase: u128 = 10 * UNIT;
+    pub const MetadataDepositPerByte: Balance = UNIT;
+    pub const ApprovalDeposit: Balance = UNIT;
+    pub const StringLimit: u32 = 50;
+    pub const RemoveItemsLimit: u32 = 1000;
+}
+
+impl pallet_assets::Config for Runtime {
+    type RuntimeEvent = RuntimeEvent;
+    type Balance = Balance; 
+    type AssetId = u32; 
+    type AssetIdParameter = u32;
+    type Currency = Balances; 
+    type CreateOrigin = AsEnsureOriginWithArg<EnsureSigned<AccountId>>;
+    type ForceOrigin = EnsureRoot<AccountId>;
+    type AssetDeposit = AssetDeposit; 
+    type AssetAccountDeposit = AssetAccountDeposit; 
+    type MetadataDepositBase = MetadataDepositBase;
+    type MetadataDepositPerByte = MetadataDepositPerByte;
+    type ApprovalDeposit = ApprovalDeposit;
+    type StringLimit = StringLimit;
+    type Freezer = ();
+    type WeightInfo = pallet_assets::weights::SubstrateWeight<Runtime>;
+    type Extra = ();
+    type RemoveItemsLimit = RemoveItemsLimit;
+    type CallbackHandle = ();
 }

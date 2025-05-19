@@ -34,13 +34,11 @@ impl frame_system::Config for Test {
 }
 
 // Custom pallet configuration
-parameter_types! {
-}
+parameter_types! {}
 
 impl kumulus_bootstrap::Config for Test {
     type RuntimeEvent = RuntimeEvent;
     type WeightInfo = kumulus_bootstrap::weights::SubstrateWeight<Test>;
-
 }
 
 // Test externalities initialization

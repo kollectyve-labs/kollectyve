@@ -1,5 +1,5 @@
 # Kollectyve Network chain 
-This is the codebase of the Kiooectyve Network parachain code
+This is the codebase of the Kollectyve Network parachain code
 
 ### Build
 

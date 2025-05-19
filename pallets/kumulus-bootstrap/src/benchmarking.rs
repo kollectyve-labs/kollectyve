@@ -10,17 +10,20 @@ mod benchmarks {
     #[cfg(test)]
     use crate::pallet::Pallet as KumulusBootstrap;
     use frame_system::RawOrigin;
-    
+
     #[benchmark]
     fn register_bootstrapper() {
         let caller: T::AccountId = whitelisted_caller();
-        
+
         #[extrinsic_call]
         register_bootstrapper(RawOrigin::Signed(caller.clone()));
 
         assert_eq!(Bootstrappers::<T>::get(caller), Some(true));
     }
-    
 
-    impl_benchmark_test_suite!(KumulusBootstrap, crate::mock::new_test_ext(), crate::mock::Test);
+    impl_benchmark_test_suite!(
+        KumulusBootstrap,
+        crate::mock::new_test_ext(),
+        crate::mock::Test
+    );
 }

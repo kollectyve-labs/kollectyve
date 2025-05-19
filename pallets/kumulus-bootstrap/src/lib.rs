@@ -38,23 +38,19 @@ pub mod pallet {
     #[pallet::generate_deposit(pub(super) fn deposit_event)]
     pub enum Event<T: Config> {
         /// Bootstrapper added.
-        BootstrapperAdded {
-            who: T::AccountId,
-        },
+        BootstrapperAdded { who: T::AccountId },
     }
 
     #[pallet::storage]
     pub(super) type Bootstrappers<T: Config> =
-    StorageMap<_, Blake2_128Concat, T::AccountId, bool, OptionQuery>;
+        StorageMap<_, Blake2_128Concat, T::AccountId, bool, OptionQuery>;
 
     #[pallet::call]
     impl<T: Config> Pallet<T> {
-
         // TODO: Simple Bootstrap mechanism to be improved
         #[pallet::call_index(0)]
         #[pallet::weight(T::WeightInfo::register_bootstrapper())]
-        pub fn register_bootstrapper(
-            origin: OriginFor<T>) -> DispatchResult {
+        pub fn register_bootstrapper(origin: OriginFor<T>) -> DispatchResult {
             let bootstrapper = ensure_signed(origin)?;
 
             // Check if the account is already a bootstrapper
@@ -65,14 +61,9 @@ pub mod pallet {
 
             Bootstrappers::<T>::insert(&bootstrapper, true);
 
-            Self::deposit_event(Event::BootstrapperAdded {
-                who: bootstrapper
-            });
+            Self::deposit_event(Event::BootstrapperAdded { who: bootstrapper });
 
             Ok(())
         }
     }
-
-
-
 }
